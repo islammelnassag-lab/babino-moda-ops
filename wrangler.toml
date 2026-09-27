@@ -1,3 +1,7 @@
 name = "babino-moda-ops"
 compatibility_date = "2026-09-27"
 pages_build_output_dir = "dist"
+
+[vars]
+VITE_SUPABASE_URL = "https://qugbrokgwtvzhgcjanmk.supabase.co"
+VITE_SUPABASE_PUBLISHABLE_KEY = "sb_publishable__xNxNBWw7QLMvyG31FaRog_yZBVTwKM"
