@@ -9,6 +9,10 @@ function organizationId() {
   return activeOrganizationId || (import.meta.env.VITE_SUPABASE_ORG_ID as string | undefined);
 }
 
+export function getActiveOrganizationId() {
+  return organizationId();
+}
+
 export function setActiveOrganizationId(organizationId: string | undefined) {
   activeOrganizationId = organizationId;
 }
