@@ -49,6 +49,8 @@ export type CampaignPerformance = {
 
 export type DashboardSummary = {
   adSpend: number;
+  leads: number;
+  costPerLead: number;
   deliveredRevenue: number;
   netProfit: number;
   roas: number;
@@ -193,12 +195,15 @@ export function calculateDashboardSummary(data: AppData): DashboardSummary {
   const campaigns = calculateCampaignPerformance(data);
   const deliveredOrders = sum(campaigns.map((row) => row.delivered));
   const adSpend = sum(campaigns.map((row) => row.adSpend));
+  const leads = sum(campaigns.map((row) => row.leads));
   const deliveredRevenue = sum(campaigns.map((row) => row.deliveredRevenue));
   const contributionBeforeAds = sum(campaigns.map((row) => row.contributionBeforeAds));
   const newCustomersDelivered = sum(campaigns.map((row) => row.newCustomersDelivered));
 
   return {
     adSpend,
+    leads,
+    costPerLead: safeDiv(adSpend, leads),
     deliveredRevenue,
     netProfit: sum(campaigns.map((row) => row.netProfitAfterAds)),
     roas: safeDiv(deliveredRevenue, adSpend),
