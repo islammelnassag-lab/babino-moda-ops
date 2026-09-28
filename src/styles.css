@@ -57,6 +57,28 @@ th { color: #7b6658; font-weight: 700; }
 .order-card p { margin: 8px 0; color: #5f5046; font-size: 13px; }
 .pill { display: inline-flex; align-items: center; min-height: 24px; border-radius: 999px; padding: 0 10px; background: #fff1d6; color: #92501c; font-size: 12px; }
 .order-summary { margin: 10px 0; justify-content: flex-start; color: #5f5046; font-size: 13px; }
+.campaign-list { display: grid; gap: 10px; }
+.campaign-card { min-width: 0; border: 1px solid #e0d6cc; border-radius: 8px; background: #fffdfa; padding: 12px; transition: border-color 0.16s ease, box-shadow 0.16s ease; }
+.campaign-card:hover, .campaign-card.expanded { border-color: #d4a083; box-shadow: 0 4px 14px rgba(88, 55, 35, 0.06); }
+.campaign-summary { display: grid; grid-template-columns: minmax(190px, 1.1fr) minmax(0, 2.2fr) auto; gap: 12px; align-items: center; }
+.campaign-main, .campaign-kpi, .metric-tile { min-width: 0; }
+.campaign-title-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.campaign-title-line strong { font-size: 16px; overflow-wrap: anywhere; }
+.campaign-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-top: 7px; color: #7b6658; font-size: 12px; }
+.campaign-meta span { min-width: 0; overflow-wrap: anywhere; }
+.campaign-kpi-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.campaign-kpi { min-height: 54px; border: 1px solid #eadfd5; border-radius: 8px; background: #f8f6f3; padding: 8px; display: grid; align-content: center; gap: 3px; }
+.campaign-kpi span, .metric-label { color: #7b6658; font-size: 11px; line-height: 1.35; }
+.campaign-kpi strong, .metric-value { color: #2e241d; font-size: 14px; overflow-wrap: anywhere; }
+.campaign-actions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
+.expand-button svg { transition: transform 0.16s ease; }
+.expand-button svg.rotated { transform: rotate(180deg); }
+.campaign-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #e4d9ce; }
+.metric-group { min-width: 0; border: 1px solid #eadfd5; border-radius: 8px; background: #fffdfa; padding: 10px; }
+.metric-group h3 { margin: 0 0 9px; color: #bd643e; font-size: 14px; letter-spacing: 0; }
+.metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.metric-tile { min-height: 52px; border: 1px solid #eee4db; border-radius: 8px; background: #f8f6f3; padding: 8px; display: grid; align-content: center; gap: 3px; }
+.empty-state { margin: 0; color: #7b6658; font-size: 13px; }
 .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .kpi-grid.compact { margin-bottom: 12px; }
 .customer-history { margin-top: 8px; }
@@ -83,5 +105,6 @@ th { color: #7b6658; font-weight: 700; }
 .auth-card { width: min(420px, 100%); display: grid; gap: 14px; background: #fffdfa; border: 1px solid #ded4ca; border-radius: 14px; padding: 24px; }
 .auth-card h1, .auth-card p { margin: 0; }
 .auth-card p, .auth-message { color: #7b6658; }
-@media (max-width: 900px) { .form-grid.two, .form-grid.three, .form-grid.four, .invoice-grid, .invoice-totals, .kpi-grid, .item-row, .variant-row { grid-template-columns: 1fr; } .title-row, .tabs { justify-content: flex-start; } }
+@media (max-width: 900px) { .form-grid.two, .form-grid.three, .form-grid.four, .invoice-grid, .invoice-totals, .kpi-grid, .campaign-summary, .campaign-details, .item-row, .variant-row { grid-template-columns: 1fr; } .campaign-kpi-grid, .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .campaign-actions { justify-content: flex-start; } .title-row, .tabs { justify-content: flex-start; } }
+@media (max-width: 560px) { .campaign-kpi-grid, .metric-grid { grid-template-columns: 1fr; } }
 @media print { body { background: #fff; } .app-header, .panel:not(.invoice-panel), .invoice-actions { display: none !important; } .workspace { width: 100%; padding: 0; } .invoice-panel { border: 0; border-radius: 0; box-shadow: none; padding: 0; } .invoice-grid, .invoice-totals { break-inside: avoid; } }
