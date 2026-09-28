@@ -28,6 +28,7 @@ import {
   deleteDailyAd,
   deleteOrder,
   deleteProduct,
+  getActiveOrganizationId,
   loadCloudData,
   loadLocalData,
   loadOrganizations,
@@ -43,6 +44,16 @@ import {
 import type { AppData, Campaign, Customer, DailyAdMetric, Order, OrderItem, OrderStatus, Product, ProductVariant } from './types';
 
 type View = 'orders' | 'campaigns' | 'ads' | 'dashboard' | 'products' | 'customers';
+const realtimeTables = [
+  'campaigns',
+  'daily_ad_metrics',
+  'customers',
+  'products',
+  'product_variants',
+  'orders',
+  'order_items',
+  'order_status_events',
+];
 
 const money = new Intl.NumberFormat('ar-EG', { style: 'currency', currency: 'EGP', maximumFractionDigits: 2 });
 const number = new Intl.NumberFormat('ar-EG', { maximumFractionDigits: 2 });
@@ -156,6 +167,59 @@ function App() {
       mounted = false;
     };
   }, [isSignedIn]);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase || !isSignedIn || cloudState !== 'connected') return;
+
+    const client = supabase;
+    let closed = false;
+    let refreshTimer: number | undefined;
+    const orgId = getActiveOrganizationId();
+
+    const refreshCloudData = async () => {
+      try {
+        const cloudData = await loadCloudData();
+        if (!closed && cloudData) {
+          setData(cloudData);
+          setCloudState('connected');
+        }
+      } catch (error) {
+        if (!closed) {
+          setCloudState('failed');
+          console.error(error);
+        }
+      }
+    };
+
+    const queueRefresh = () => {
+      window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(refreshCloudData, 650);
+    };
+
+    const channel = client.channel(`babino-ops-sync-${orgId ?? 'default'}`);
+    realtimeTables.forEach((table) => {
+      channel.on('postgres_changes', { event: '*', schema: 'public', table }, queueRefresh);
+    });
+    channel.subscribe((status) => {
+      if (status === 'SUBSCRIBED') queueRefresh();
+    });
+
+    const interval = window.setInterval(refreshCloudData, 15000);
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') queueRefresh();
+    };
+    window.addEventListener('focus', queueRefresh);
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+
+    return () => {
+      closed = true;
+      window.clearTimeout(refreshTimer);
+      window.clearInterval(interval);
+      window.removeEventListener('focus', queueRefresh);
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+      client.removeChannel(channel);
+    };
+  }, [cloudState, isSignedIn]);
 
   useEffect(() => saveLocalData(data), [data]);
   useEffect(() => {
