@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BarChart3, Cloud, HardDrive, Plus, Trash2 } from 'lucide-react';
+import { BarChart3, ChevronDown, Cloud, HardDrive, Plus, Trash2 } from 'lucide-react';
 import { demoData } from './data/demoData';
 import {
   calculateCampaignPerformance,
@@ -356,6 +356,22 @@ function Kpi({ label, value }: { label: string; value: string }) {
   return <div className="kpi-card"><span>{label}</span><strong>{value}</strong></div>;
 }
 
+function MetricGroup({ title, items }: { title: string; items: Array<{ label: string; value: React.ReactNode }> }) {
+  return (
+    <div className="metric-group">
+      <h3>{title}</h3>
+      <div className="metric-grid">
+        {items.map((item) => (
+          <div className="metric-tile" key={item.label}>
+            <span className="metric-label">{item.label}</span>
+            <strong className="metric-value">{item.value || '-'}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function OrdersView({
   data,
   onSave,
@@ -621,6 +637,7 @@ function OrderForm({ data, editing, onCancel, onSave }: { data: AppData; editing
 
 function CampaignsView({ data, setData, rows }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; rows: ReturnType<typeof calculateCampaignPerformance> }) {
   const [form, setForm] = useState<Campaign>(() => newCampaign());
+  const [expandedCampaignId, setExpandedCampaignId] = useState<string | null>(null);
 
   function reset() {
     setForm(newCampaign());
@@ -670,113 +687,123 @@ function CampaignsView({ data, setData, rows }: { data: AppData; setData: React.
       </form>
       <section className="panel">
         <PanelHeader title="أداء الحملات" />
-        <div className="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Campaign ID</th>
-                <th>Campaign Name</th>
-                <th>Brand / Product</th>
-                <th>Platform</th>
-                <th>Ad Type</th>
-                <th>Objective</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Status</th>
-                <th>Target CPA Delivered (EGP)</th>
-                <th>Target ROAS (x)</th>
-                <th>Ad Spend (EGP)</th>
-                <th>Impressions</th>
-                <th>Clicks</th>
-                <th>Conversations</th>
-                <th>Leads</th>
-                <th>CPM (EGP)</th>
-                <th>CPC (EGP)</th>
-                <th>CTR</th>
-                <th>Cost / Conversation (EGP)</th>
-                <th>Cost / Lead (EGP)</th>
-                <th>Orders Created</th>
-                <th>Confirmed Funnel</th>
-                <th>Shipped Funnel</th>
-                <th>Delivered</th>
-                <th>Cancelled</th>
-                <th>Returned</th>
-                <th>New Customers Delivered</th>
-                <th>Confirmation Rate</th>
-                <th>Delivery Rate from Confirmed</th>
-                <th>Return Rate</th>
-                <th>CPA Confirmed (EGP)</th>
-                <th>CPA Delivered (EGP)</th>
-                <th>CAC New Customer (EGP)</th>
-                <th>Delivered Revenue (EGP)</th>
-                <th>Delivered COGS (EGP)</th>
-                <th>Order Variable Costs (EGP)</th>
-                <th>Contribution Before Ads (EGP)</th>
-                <th>Net Profit After Ads (EGP)</th>
-                <th>ROAS (x)</th>
-                <th>Profit Margin</th>
-                <th>Break-even CPA (EGP)</th>
-                <th>Profit / Delivered Order (EGP)</th>
-                <th>CPA Variance vs Target</th>
-                <th>Verdict</th>
-                <th>Notes</th>
-                <th>إجراءات</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.campaign.id}>
-                  <td>{row.campaign.code}</td>
-                  <td>{row.campaign.name}</td>
-                  <td>{row.campaign.brandProduct}</td>
-                  <td>{row.campaign.platform}</td>
-                  <td>{row.campaign.adType}</td>
-                  <td>{row.campaign.objective}</td>
-                  <td>{row.campaign.startDate}</td>
-                  <td>{row.campaign.endDate}</td>
-                  <td>{row.campaign.status}</td>
-                  <td>{money.format(row.campaign.targetCpaDelivered)}</td>
-                  <td>{number.format(row.campaign.targetRoas)}</td>
-                  <td>{money.format(row.adSpend)}</td>
-                  <td>{number.format(row.impressions)}</td>
-                  <td>{number.format(row.clicks)}</td>
-                  <td>{number.format(row.conversations)}</td>
-                  <td>{number.format(row.leads)}</td>
-                  <td>{money.format(row.cpm)}</td>
-                  <td>{money.format(row.cpc)}</td>
-                  <td>{percent(row.ctr)}</td>
-                  <td>{money.format(row.costPerConversation)}</td>
-                  <td>{money.format(row.costPerLead)}</td>
-                  <td>{number.format(row.ordersCreated)}</td>
-                  <td>{number.format(row.confirmedFunnel)}</td>
-                  <td>{number.format(row.shippedFunnel)}</td>
-                  <td>{number.format(row.delivered)}</td>
-                  <td>{number.format(row.cancelled)}</td>
-                  <td>{number.format(row.returned)}</td>
-                  <td>{number.format(row.newCustomersDelivered)}</td>
-                  <td>{percent(row.confirmationRate)}</td>
-                  <td>{percent(row.deliveryRateFromConfirmed)}</td>
-                  <td>{percent(row.returnRate)}</td>
-                  <td>{money.format(row.cpaConfirmed)}</td>
-                  <td>{money.format(row.cpaDelivered)}</td>
-                  <td>{money.format(row.cacNewCustomer)}</td>
-                  <td>{money.format(row.deliveredRevenue)}</td>
-                  <td>{money.format(row.deliveredCogs)}</td>
-                  <td>{money.format(row.orderVariableCosts)}</td>
-                  <td>{money.format(row.contributionBeforeAds)}</td>
-                  <td>{money.format(row.netProfitAfterAds)}</td>
-                  <td>{number.format(row.roas)}</td>
-                  <td>{percent(row.profitMargin)}</td>
-                  <td>{money.format(row.breakEvenCpa)}</td>
-                  <td>{money.format(row.profitPerDeliveredOrder)}</td>
-                  <td>{percent(row.cpaVarianceVsTarget)}</td>
-                  <td>{row.verdict}</td>
-                  <td>{row.campaign.notes}</td>
-                  <td><button className="ghost-button" onClick={() => setForm(row.campaign)}>تعديل</button><button className="danger-button" onClick={() => remove(row.campaign.id)}>حذف</button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="campaign-list">
+          {rows.length === 0 && <p className="empty-state">لا توجد حملات بعد</p>}
+          {rows.map((row) => {
+            const isExpanded = expandedCampaignId === row.campaign.id;
+            const detailGroups = [
+              {
+                title: 'بيانات الحملة',
+                items: [
+                  { label: 'Campaign ID', value: row.campaign.code },
+                  { label: 'Campaign Name', value: row.campaign.name },
+                  { label: 'Brand / Product', value: row.campaign.brandProduct },
+                  { label: 'Platform', value: row.campaign.platform },
+                  { label: 'Ad Type', value: row.campaign.adType },
+                  { label: 'Objective', value: row.campaign.objective },
+                  { label: 'Start Date', value: row.campaign.startDate },
+                  { label: 'End Date', value: row.campaign.endDate },
+                  { label: 'Status', value: row.campaign.status },
+                  { label: 'Target CPA Delivered', value: money.format(row.campaign.targetCpaDelivered) },
+                  { label: 'Target ROAS (x)', value: number.format(row.campaign.targetRoas) },
+                ],
+              },
+              {
+                title: 'الصرف والتفاعل',
+                items: [
+                  { label: 'Ad Spend', value: money.format(row.adSpend) },
+                  { label: 'Impressions', value: number.format(row.impressions) },
+                  { label: 'Clicks', value: number.format(row.clicks) },
+                  { label: 'Conversations', value: number.format(row.conversations) },
+                  { label: 'Leads', value: number.format(row.leads) },
+                  { label: 'CPM', value: money.format(row.cpm) },
+                  { label: 'CPC', value: money.format(row.cpc) },
+                  { label: 'CTR', value: percent(row.ctr) },
+                  { label: 'Cost / Conversation', value: money.format(row.costPerConversation) },
+                  { label: 'Cost / Lead', value: money.format(row.costPerLead) },
+                ],
+              },
+              {
+                title: 'الأوردرات والفانل',
+                items: [
+                  { label: 'Orders Created', value: number.format(row.ordersCreated) },
+                  { label: 'Confirmed Funnel', value: number.format(row.confirmedFunnel) },
+                  { label: 'Shipped Funnel', value: number.format(row.shippedFunnel) },
+                  { label: 'Delivered', value: number.format(row.delivered) },
+                  { label: 'Cancelled', value: number.format(row.cancelled) },
+                  { label: 'Returned', value: number.format(row.returned) },
+                  { label: 'New Customers Delivered', value: number.format(row.newCustomersDelivered) },
+                  { label: 'Confirmation Rate', value: percent(row.confirmationRate) },
+                  { label: 'Delivery Rate from Confirmed', value: percent(row.deliveryRateFromConfirmed) },
+                  { label: 'Return Rate', value: percent(row.returnRate) },
+                ],
+              },
+              {
+                title: 'الربحية',
+                items: [
+                  { label: 'CPA Confirmed', value: money.format(row.cpaConfirmed) },
+                  { label: 'CPA Delivered', value: money.format(row.cpaDelivered) },
+                  { label: 'CAC New Customer', value: money.format(row.cacNewCustomer) },
+                  { label: 'Delivered Revenue', value: money.format(row.deliveredRevenue) },
+                  { label: 'Delivered COGS', value: money.format(row.deliveredCogs) },
+                  { label: 'Order Variable Costs', value: money.format(row.orderVariableCosts) },
+                  { label: 'Contribution Before Ads', value: money.format(row.contributionBeforeAds) },
+                  { label: 'Net Profit After Ads', value: money.format(row.netProfitAfterAds) },
+                  { label: 'ROAS (x)', value: number.format(row.roas) },
+                  { label: 'Profit Margin', value: percent(row.profitMargin) },
+                  { label: 'Break-even CPA', value: money.format(row.breakEvenCpa) },
+                  { label: 'Profit / Delivered Order', value: money.format(row.profitPerDeliveredOrder) },
+                  { label: 'CPA Variance vs Target', value: percent(row.cpaVarianceVsTarget) },
+                ],
+              },
+              {
+                title: 'الحكم والملاحظات',
+                items: [
+                  { label: 'Verdict', value: row.verdict },
+                  { label: 'Notes', value: row.campaign.notes },
+                ],
+              },
+            ];
+
+            return (
+              <article className={`campaign-card ${isExpanded ? 'expanded' : ''}`} key={row.campaign.id} onClick={() => setExpandedCampaignId(isExpanded ? null : row.campaign.id)}>
+                <div className="campaign-summary">
+                  <div className="campaign-main">
+                    <div className="campaign-title-line">
+                      <strong>{row.campaign.name || 'حملة بدون اسم'}</strong>
+                      <span className="pill">{row.campaign.status}</span>
+                    </div>
+                    <div className="campaign-meta">
+                      <span>{row.campaign.code}</span>
+                      <span>{row.campaign.platform}</span>
+                      <span>{row.campaign.brandProduct || 'بدون منتج'}</span>
+                    </div>
+                  </div>
+                  <div className="campaign-kpi-grid">
+                    <div className="campaign-kpi"><span>الصرف</span><strong>{money.format(row.adSpend)}</strong></div>
+                    <div className="campaign-kpi"><span>الأوردرات</span><strong>{number.format(row.ordersCreated)}</strong></div>
+                    <div className="campaign-kpi"><span>Delivered</span><strong>{number.format(row.delivered)}</strong></div>
+                    <div className="campaign-kpi"><span>Revenue</span><strong>{money.format(row.deliveredRevenue)}</strong></div>
+                    <div className="campaign-kpi"><span>Net Profit</span><strong>{money.format(row.netProfitAfterAds)}</strong></div>
+                    <div className="campaign-kpi"><span>ROAS</span><strong>{number.format(row.roas)}x</strong></div>
+                  </div>
+                  <div className="campaign-actions" onClick={(event) => event.stopPropagation()}>
+                    <button className="ghost-button expand-button" type="button" onClick={() => setExpandedCampaignId(isExpanded ? null : row.campaign.id)}>
+                      <ChevronDown className={isExpanded ? 'rotated' : ''} size={16} />
+                      {isExpanded ? 'إخفاء' : 'تفاصيل'}
+                    </button>
+                    <button className="ghost-button" type="button" onClick={() => setForm(row.campaign)}>تعديل</button>
+                    <button className="danger-button" type="button" onClick={() => remove(row.campaign.id)}>حذف</button>
+                  </div>
+                </div>
+                {isExpanded && (
+                  <div className="campaign-details">
+                    {detailGroups.map((group) => <MetricGroup title={group.title} items={group.items} key={group.title} />)}
+                  </div>
+                )}
+              </article>
+            );
+          })}
         </div>
       </section>
     </div>
